@@ -3,6 +3,7 @@ name = "pythonanywhere-client"
 description = "PythonAnywhereClient"
 dynamic = ['version']
 authors = [{ name = "sysproxy", email = "sysproxy64@gmail.com" }]
+readme = "README.md"
 classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
