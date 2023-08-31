@@ -255,6 +255,7 @@ class PythonAnywhereClient:
                 error=True,
                 data={'message': 'Extend task failed'}
             )
+
         return Response(
             status_code=response.status_code,
             error=False
@@ -344,9 +345,6 @@ class PythonAnywhereClient:
             url,
             headers={'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
         )
-
-        print(response.status_code)
-        print(response.text)
 
         if response.status_code != 200:
             return Response(
