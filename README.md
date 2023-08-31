@@ -18,7 +18,12 @@ from pythonanywhere_client import PythonAnywhereClient
 username = 'your_username'
 password = 'your_password'
 
+# Replace with your User-Agent
+user_agent_string = 'my_user_agent_string'
+
+# Create client and request session
 client = PythonAnywhereClient(username, password)
+client.create_session(user_agent_string)
 
 # Logging in
 login_response = client.login()
