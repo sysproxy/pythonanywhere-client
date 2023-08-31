@@ -1,6 +1,6 @@
 [project]
 name = "pythonanywhere-client"
-description = "PythonAnywhereClient"
+description = "This is a Python library for interacting with the PythonAnywhere platform"
 dynamic = ['version']
 authors = [{ name = "sysproxy", email = "sysproxy64@gmail.com" }]
 readme = "README.md"
