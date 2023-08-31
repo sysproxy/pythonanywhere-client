@@ -157,6 +157,11 @@ class PythonAnywhereClient:
                     data={'message': 'Extracting failed'}
                 )
 
+        return Response(
+            status_code=response.status_code,
+            error=True,
+        )
+
     def get_csrf_token(self) -> Response:
         app_url = self.create_url(f'/user/{self.username}/webapps/')
 
