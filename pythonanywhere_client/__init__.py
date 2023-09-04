@@ -26,6 +26,13 @@ class Response:
     error: Optional[bool] = False
     data: Optional[Union[dict, list, tuple, None]] = None
 
+    def to_dict(self):
+        return {
+            'status_code': self.status_code,
+            'error': self.error,
+            'data': self.data
+        }
+
 
 class PythonAnywhereClient:
     BASE_URL = 'https://www.pythonanywhere.com'
