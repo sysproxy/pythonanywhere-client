@@ -47,7 +47,7 @@ class PythonAnywhereClient:
     def create_url(uri: str) -> str:
         return f'{PythonAnywhereClient.BASE_URL}{uri}'
 
-    def create_session(self, user_agent: str):
+    def create_session(self, user_agent: str) -> None:
         self.session = requests.session()
         self.session.headers = {'User-Agent': user_agent}
 
@@ -62,7 +62,7 @@ class PythonAnywhereClient:
     def get_cookies(self) -> dict:
         return self.session.cookies.get_dict()
 
-    def load_cookies(self, cookies: dict):
+    def load_cookies(self, cookies: dict) -> None:
         self.session.cookies.update(cookiejar_from_dict(cookies))
 
     def logout(self) -> Response:
@@ -80,12 +80,18 @@ class PythonAnywhereClient:
             allow_redirects=False
         )
 
+        if response.status_code == 302:
+            data = {'message': 'Logout successful'}
+        else:
+            data = {'message': 'Logout failed'}
+
         return Response(
             status_code=response.status_code,
-            error=response.status_code != 302
+            error=response.status_code != 302,
+            data=data
         )
 
-    def login(self) -> Response | bool:
+    def login(self) -> Response:
         url = self.create_url('/login/')
 
         response = self.session.get(url)
@@ -131,7 +137,8 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False
+            error=False,
+            data={'message': 'Login successful'}
         )
 
     def get_app_expiry_date(self, app_name: str) -> Response:
@@ -167,6 +174,7 @@ class PythonAnywhereClient:
         return Response(
             status_code=response.status_code,
             error=True,
+            data={'message': 'Get app expiry date failed'}
         )
 
     def get_csrf_token(self) -> Response:
@@ -212,12 +220,13 @@ class PythonAnywhereClient:
             return Response(
                 status_code=response.status_code,
                 error=True,
-                data={'message': 'Reload failed'}
+                data={'message': 'Reload app failed'}
             )
 
         return Response(
             status_code=response.status_code,
-            error=False
+            error=False,
+            data={'message': 'Reload app successful'}
         )
 
     def extend_app(self, app_name: str) -> Response:
@@ -241,7 +250,8 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False
+            error=False,
+            data={'message': 'Extend app successful'}
         )
 
     def extend_task(self, task_id: int) -> Response:
@@ -265,7 +275,8 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False
+            error=False,
+            data={'message': 'Extend task successful'}
         )
 
     def get_tasks(self) -> Response:
@@ -286,6 +297,7 @@ class PythonAnywhereClient:
             return Response(
                 status_code=response.status_code,
                 error=True,
+                data={'message': 'Get tasks failed'}
             )
 
     def create_task(self, command: str, description: str, hour: int, minute: int, enabled: bool = True,
@@ -315,7 +327,8 @@ class PythonAnywhereClient:
         if response.status_code != 201:
             return Response(
                 status_code=response.status_code,
-                error=True
+                error=True,
+                data={'message': 'Create task failed'}
             )
 
         return Response(
@@ -340,9 +353,15 @@ class PythonAnywhereClient:
             headers=headers
         )
 
+        if response.status_code == 204:
+            data = {'message': 'Delete task successful'}
+        else:
+            data = {'message': 'Delete task failed'}
+
         return Response(
             status_code=response.status_code,
             error=response.status_code != 204,
+            data=data
         )
 
     def can_create_tasks(self) -> Response:
@@ -356,7 +375,8 @@ class PythonAnywhereClient:
         if response.status_code != 200:
             return Response(
                 status_code=response.status_code,
-                error=True
+                error=True,
+                data={'message': 'Can create tasks failed'}
             )
 
         return Response(
