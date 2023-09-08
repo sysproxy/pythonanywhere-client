@@ -42,7 +42,7 @@ class PythonAnywhereApi:
         self.region = region
 
         if self.region == 'us':
-            self.base_url = f'https://www.pythonanywherez.com/api/v0/user/{self.username}'
+            self.base_url = f'https://www.pythonanywhere.com/api/v0/user/{self.username}'
         elif self.region == 'eu':
             self.base_url = f'https://eu.pythonanywhere.com/api/v0/user/{self.username}'
         else:
