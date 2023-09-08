@@ -4,6 +4,7 @@ import calendar
 import datetime
 import json
 import re
+import traceback
 from dataclasses import dataclass
 from typing import Union, Optional
 
@@ -34,7 +35,7 @@ class Response:
         }
 
 
-class PythonAnywhereClient:
+class PythonAnywhereWeb:
     BASE_URL = 'https://www.pythonanywhere.com'
 
     def __init__(self, username, password):
@@ -45,11 +46,12 @@ class PythonAnywhereClient:
 
     @staticmethod
     def create_url(uri: str) -> str:
-        return f'{PythonAnywhereClient.BASE_URL}{uri}'
+        return f'{PythonAnywhereWeb.BASE_URL}{uri}'
 
-    def create_session(self, user_agent: str) -> None:
+    def create_session(self, user_agent: str, timeout: int = 10):
         self.session = requests.session()
         self.session.headers = {'User-Agent': user_agent}
+        self.session.timeout = timeout
 
     @staticmethod
     def extract_csrf_token(response_text: str) -> str:
@@ -62,7 +64,7 @@ class PythonAnywhereClient:
     def get_cookies(self) -> dict:
         return self.session.cookies.get_dict()
 
-    def load_cookies(self, cookies: dict) -> None:
+    def load_cookies(self, cookies: dict):
         self.session.cookies.update(cookiejar_from_dict(cookies))
 
     def logout(self) -> Response:
@@ -73,28 +75,33 @@ class PythonAnywhereClient:
         if csrf_token.error:
             return csrf_token
 
-        response = self.session.post(
-            url,
-            {'csrfmiddlewaretoken': csrf_token.data['csrf_token']},
-            headers={'Referer': self.create_url('/')},
-            allow_redirects=False
-        )
-
-        if response.status_code == 302:
-            data = {'message': 'Logout successful'}
-        else:
-            data = {'message': 'Logout failed'}
+        try:
+            data = {'csrfmiddlewaretoken': csrf_token.data['csrf_token']}
+            headers = {'Referer': self.create_url('/')}
+            response = self.session.post(url, data=data, headers=headers, allow_redirects=False)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         return Response(
             status_code=response.status_code,
-            error=response.status_code != 302,
-            data=data
+            error=response.status_code != 302
         )
 
-    def login(self) -> Response:
+    def login(self) -> Response | bool:
         url = self.create_url('/login/')
 
-        response = self.session.get(url)
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         csrf_token = self.extract_csrf_token(response.text)
 
@@ -112,11 +119,16 @@ class PythonAnywhereClient:
             'login_view-current_step': 'auth'
         }
 
-        response = self.session.post(
-            url,
-            data,
-            headers={'Referer': url}
-        )
+        headers = {'Referer': url}
+
+        try:
+            response = self.session.post(url, data=data, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200:
             return Response(
@@ -137,14 +149,20 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False,
-            data={'message': 'Login successful'}
+            error=False
         )
 
     def get_app_expiry_date(self, app_name: str) -> Response:
         url = self.create_url(f'/user/{self.username}/webapps/')
 
-        response = self.session.get(url)
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200:
             return Response(
@@ -174,13 +192,19 @@ class PythonAnywhereClient:
         return Response(
             status_code=response.status_code,
             error=True,
-            data={'message': 'Get app expiry date failed'}
         )
 
     def get_csrf_token(self) -> Response:
         app_url = self.create_url(f'/user/{self.username}/webapps/')
 
-        response = self.session.get(app_url)
+        try:
+            response = self.session.get(app_url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200:
             return Response(
@@ -210,23 +234,29 @@ class PythonAnywhereClient:
         if csrf_token.error:
             return csrf_token
 
-        response = self.session.post(
-            self.create_url(f'/user/{self.username}/webapps/{app_name}.pythonanywhere.com/reload'),
-            {'csrfmiddlewaretoken': csrf_token.data['csrf_token']},
-            headers={'Referer': self.create_url(f'/user/{self.username}/webapps/')}
-        )
+        url = self.create_url(f'/user/{self.username}/webapps/{app_name}.pythonanywhere.com/reload')
+        data = {'csrfmiddlewaretoken': csrf_token.data['csrf_token']}
+        headers = {'Referer': self.create_url(f'/user/{self.username}/webapps/')}
+
+        try:
+            response = self.session.post(url, data=data, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200 or response.text != 'OK':
             return Response(
                 status_code=response.status_code,
                 error=True,
-                data={'message': 'Reload app failed'}
+                data={'message': 'Reload failed'}
             )
 
         return Response(
             status_code=response.status_code,
-            error=False,
-            data={'message': 'Reload app successful'}
+            error=False
         )
 
     def extend_app(self, app_name: str) -> Response:
@@ -235,11 +265,18 @@ class PythonAnywhereClient:
         if csrf_token.error:
             return csrf_token
 
-        response = self.session.post(
-            self.create_url(f'/user/{self.username}/webapps/{app_name}.pythonanywhere.com/extend'),
-            {'csrfmiddlewaretoken': csrf_token.data['csrf_token']},
-            headers={'Referer': self.create_url(f'/user/{self.username}/webapps/')}
-        )
+        url = self.create_url(f'/user/{self.username}/webapps/{app_name}.pythonanywhere.com/extend')
+        data = {'csrfmiddlewaretoken': csrf_token.data['csrf_token']}
+        headers = {'Referer': self.create_url(f'/user/{self.username}/webapps/')}
+
+        try:
+            response = self.session.post(url, data=data, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200:
             return Response(
@@ -250,8 +287,7 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False,
-            data={'message': 'Extend app successful'}
+            error=False
         )
 
     def extend_task(self, task_id: int) -> Response:
@@ -260,11 +296,18 @@ class PythonAnywhereClient:
         if csrf_token.error:
             return csrf_token
 
-        response = self.session.post(
-            self.create_url(f'/user/{self.username}/schedule/task/{task_id}/extend'),
-            {'csrfmiddlewaretoken': csrf_token.data['csrf_token']},
-            headers={'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
-        )
+        url = self.create_url(f'/user/{self.username}/schedule/task/{task_id}/extend')
+        data = {'csrfmiddlewaretoken': csrf_token.data['csrf_token']}
+        headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
+
+        try:
+            response = self.session.post(url, data=data, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200 or response.json()['status'] != 'success':
             return Response(
@@ -275,17 +318,21 @@ class PythonAnywhereClient:
 
         return Response(
             status_code=response.status_code,
-            error=False,
-            data={'message': 'Extend task successful'}
+            error=False
         )
 
     def get_tasks(self) -> Response:
         url = self.create_url(f'/api/v0/user/{self.username}/schedule/')
+        headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
 
-        response = self.session.get(
-            url,
-            headers={'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
-        )
+        try:
+            response = self.session.get(url, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         try:
             return Response(
@@ -297,7 +344,6 @@ class PythonAnywhereClient:
             return Response(
                 status_code=response.status_code,
                 error=True,
-                data={'message': 'Get tasks failed'}
             )
 
     def create_task(self, command: str, description: str, hour: int, minute: int, enabled: bool = True,
@@ -318,17 +364,19 @@ class PythonAnywhereClient:
             'X-CSRFToken': self.get_csrf_token().data['csrf_token']
         }
 
-        response = self.session.post(
-            url,
-            data=data,
-            headers=headers
-        )
+        try:
+            response = self.session.post(url, data=data, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 201:
             return Response(
                 status_code=response.status_code,
-                error=True,
-                data={'message': 'Create task failed'}
+                error=True
             )
 
         return Response(
@@ -348,35 +396,36 @@ class PythonAnywhereClient:
             'X-CSRFToken': self.get_csrf_token().data['csrf_token']
         }
 
-        response = self.session.delete(
-            url,
-            headers=headers
-        )
-
-        if response.status_code == 204:
-            data = {'message': 'Delete task successful'}
-        else:
-            data = {'message': 'Delete task failed'}
+        try:
+            response = self.session.delete(url, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         return Response(
             status_code=response.status_code,
             error=response.status_code != 204,
-            data=data
         )
 
     def can_create_tasks(self) -> Response:
         url = self.create_url(f'/api/v0/user/{self.username}/user_perms/schedule/')
-
-        response = self.session.get(
-            url,
-            headers={'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
-        )
+        headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
+        try:
+            response = self.session.get(url, headers=headers)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
 
         if response.status_code != 200:
             return Response(
                 status_code=response.status_code,
-                error=True,
-                data={'message': 'Can create tasks failed'}
+                error=True
             )
 
         return Response(

@@ -11,8 +11,10 @@ pip install pythonanywhere-client
 ```
 
 ## Usage
+
+### PythonAnywhereWeb
 ```python
-from pythonanywhere_client import PythonAnywhereClient
+from pythonanywhere_client import PythonAnywhereWeb
 
 # Replace with your PythonAnywhere username and password
 username = 'your_username'
@@ -22,7 +24,7 @@ password = 'your_password'
 user_agent_string = 'my_user_agent_string'
 
 # Create client and request session
-client = PythonAnywhereClient(username, password)
+client = PythonAnywhereWeb(username, password)
 client.create_session(user_agent_string)
 
 # Logging in
@@ -43,10 +45,11 @@ if expiry_response.error:
 else:
     print('Expiry Date:', expiry_response.data['expiry_date'])
 
-# ... (other tasks)
-
+# ... (other methods)
 ```
+
 ## Methods
+### PythonAnywhereWeb
 * `login()` - Log in to the PythonAnywhere platform
 * `logout()`- Log out from the PythonAnywhere platform
 * `get_app_expiry_date(app_name)` - Get the expiry date of a web application
@@ -57,6 +60,7 @@ else:
 * `extend_task(task_id)`- Extend the schedule of a task.
 * `extend_app(app_name)`- Extend the schedule of a web application.
 * `can_create_tasks()`- Check if the user is allowed to create tasks.
+
 
 
 ## Contributing

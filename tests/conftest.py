@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pythonanywhere_client import PythonAnywhereClient
+from pythonanywhere_client import PythonAnywhereWeb
 
 
 @pytest.fixture(scope='module')
@@ -25,8 +25,8 @@ def constants():
 
 
 @pytest.fixture(scope='module')
-def pa(constants):
-    p = PythonAnywhereClient(
+def web(constants):
+    p = PythonAnywhereWeb(
         os.environ.get('PA_USERNAME'),
         os.environ.get('PA_PASSWORD')
     )
