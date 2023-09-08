@@ -48,6 +48,29 @@ else:
 # ... (other methods)
 ```
 
+### PythonAnywhereApi
+```python
+from pythonanywhere_client import PythonAnywhereApi
+
+# Replace with your API token
+token = 'my_api_token'
+
+# Replace with your User-Agent
+user_agent_string = 'my_user_agent_string'
+
+client = PythonAnywhereApi(token)
+client.create_session(user_agent_string)
+
+file_response = client.get_file('/home/myusername/test.txt')
+
+if file_response.error:
+    print('Error: ', file_response.data['message'])
+else:
+    print('File content: ', file_response.data['content'])
+    
+# ... (other methods)
+```
+
 ## Methods
 ### PythonAnywhereWeb
 * `login()` - Log in to the PythonAnywhere platform
@@ -61,6 +84,11 @@ else:
 * `extend_app(app_name)`- Extend the schedule of a web application.
 * `can_create_tasks()`- Check if the user is allowed to create tasks.
 
+### PythonAnywhereApi
+* `list_consoles()` - List active consoles
+* `console_latest_output(console_id)` - Get the latest output from the console
+* `console_input(console_id, input_string)` - Send the input to the console
+* `get_file(path)` - Get the contents of the file
 
 
 ## Contributing

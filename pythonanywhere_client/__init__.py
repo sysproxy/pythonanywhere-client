@@ -35,6 +35,105 @@ class Response:
         }
 
 
+class PythonAnywhereApi:
+    def __init__(self, username, token, region='us'):
+        self.username = username
+        self.token = token
+        self.region = region
+
+        if self.region == 'us':
+            self.base_url = f'https://www.pythonanywherez.com/api/v0/user/{self.username}'
+        elif self.region == 'eu':
+            self.base_url = f'https://eu.pythonanywhere.com/api/v0/user/{self.username}'
+        else:
+            raise Exception('Invalid region provided')
+
+    def create_url(self, uri: str) -> str:
+        return f'{self.base_url}{uri}'
+
+    def create_session(self, user_agent: str, timeout: int = 10):
+        self.session = requests.session()
+        self.session.headers = {
+            'User-Agent': user_agent,
+            'Authorization': f'Token {self.token}'
+        }
+        self.session.timeout = timeout
+
+    def list_consoles(self) -> Response:
+        url = self.create_url('/consoles/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=json.loads(response.text)
+        )
+
+    def console_latest_output(self, console_id: int) -> Response:
+        url = self.create_url(f'/consoles/{console_id}/get_latest_output')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=json.loads(response.text)
+        )
+
+    def console_input(self, console_id: int, input_string: str) -> Response:
+        url = self.create_url(f'/consoles/{console_id}/send_input/')
+
+        data = {'input': input_string}
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=json.loads(response.text)
+        )
+
+    def get_file(self, path: str) -> Response:
+        url = self.create_url(f'/files/path{path}')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data={'content': response.text}
+        )
+
+
 class PythonAnywhereWeb:
     BASE_URL = 'https://www.pythonanywhere.com'
 
