@@ -1,6 +1,18 @@
 import uuid
 
 
+def test_create_list_delete_console(api):
+    create_console = api.create_console()
+    assert not create_console.error
+
+    list_consoles = api.list_consoles()
+    assert not list_consoles.error
+    assert len(list_consoles.data) > 0
+
+    delete_console = api.delete_console(create_console.data['id'])
+    assert not delete_console.error
+
+
 def test_list_consoles(api):
     consoles = api.list_consoles()
 

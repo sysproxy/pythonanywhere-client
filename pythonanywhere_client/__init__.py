@@ -59,6 +59,50 @@ class PythonAnywhereApi:
         }
         self.session.timeout = timeout
 
+    def create_console(self, executable: str = 'bash', arguments: str = None,
+                       working_directory: str = None) -> Response:
+        url = self.create_url('/consoles/')
+
+        data = {'executable': executable}
+
+        if arguments:
+            data['arguments'] = arguments
+
+        if working_directory:
+            data['working_directory'] = working_directory
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 201,
+            data=json.loads(response.text)
+        )
+
+    def delete_console(self, console_id: int) -> Response:
+        url = self.create_url(f'/consoles/{console_id}/')
+
+        try:
+            response = self.session.delete(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 204,
+        )
+
     def list_consoles(self) -> Response:
         url = self.create_url('/consoles/')
 
