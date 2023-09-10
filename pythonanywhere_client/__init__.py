@@ -78,7 +78,7 @@ class PythonAnywhereApi:
         )
 
     def console_latest_output(self, console_id: int) -> Response:
-        url = self.create_url(f'/consoles/{console_id}/get_latest_output')
+        url = self.create_url(f'/consoles/{console_id}/get_latest_output/')
 
         try:
             response = self.session.get(url)
@@ -548,6 +548,7 @@ class PythonAnywhereWeb:
     def can_create_tasks(self) -> Response:
         url = self.create_url(f'/api/v0/user/{self.username}/user_perms/schedule/')
         headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
+
         try:
             response = self.session.get(url, headers=headers)
         except requests.exceptions.RequestException:
