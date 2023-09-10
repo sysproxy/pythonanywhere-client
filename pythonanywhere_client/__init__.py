@@ -133,6 +133,42 @@ class PythonAnywhereApi:
             data={'content': response.text}
         )
 
+    def create_file(self, path: str, content: bytes) -> Response:
+        url = self.create_url(f'/files/path{path}')
+
+        files = {'content': content}
+
+        try:
+            response = self.session.post(url, files=files)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code not in (200, 201),
+        )
+
+    def delete_file(self, path) -> Response:
+        url = self.create_url(f'/files/path{path}')
+
+        try:
+            response = self.session.delete(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 204,
+        )
+
 
 class PythonAnywhereWeb:
     BASE_URL = 'https://www.pythonanywhere.com'
