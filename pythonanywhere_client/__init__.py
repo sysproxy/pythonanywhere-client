@@ -11,6 +11,11 @@ from typing import Union, Optional
 import requests
 from requests.cookies import cookiejar_from_dict
 from requests.models import Response
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.expected_conditions import visibility_of_element_located
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 def add_months(date: datetime.date, months: int) -> datetime.date:
@@ -317,6 +322,7 @@ class PythonAnywhereWeb:
         self.password = password
 
         self.session = None
+        self.selenium = None
 
     @staticmethod
     def create_url(uri: str) -> str:
@@ -340,6 +346,18 @@ class PythonAnywhereWeb:
 
     def load_cookies(self, cookies: dict):
         self.session.cookies.update(cookiejar_from_dict(cookies))
+
+    def setup_selenium(self):
+        options = webdriver.ChromeOptions()
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+
+        self.selenium = webdriver.Chrome(options=options)
+
+    def add_selenium_cookies(self):
+        for name, value in self.get_cookies().items():
+            self.selenium.add_cookie({'name': name, 'value': value})
 
     def logout(self) -> Response:
         url = self.create_url('/logout/')
@@ -594,3 +612,37 @@ class PythonAnywhereWeb:
             status_code=response.status_code,
             error=False
         )
+
+    def start_console(self, console_id: int, timeout: int = 60):
+        url = self.create_url(f'/user/{self.username}/consoles/{console_id}/frame/')
+
+        self.setup_selenium()
+
+        try:
+            self.selenium.get(self.BASE_URL)
+            self.add_selenium_cookies()
+
+            self.selenium.get(url)
+
+            self.selenium.switch_to.frame(0)
+
+            WebDriverWait(self.selenium, timeout).until(
+                visibility_of_element_located((By.XPATH, "//x-row[contains(text(), '~')]"))
+            )
+
+            return Response(error=False)
+
+        except TimeoutException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': 'Timed out waiting for console to start.'}
+            )
+        except Exception:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+        finally:
+            self.selenium.quit()

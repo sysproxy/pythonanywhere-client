@@ -94,3 +94,14 @@ def test_extend_task(api, web, constants):
     api.delete_task(task.data['id'])
 
     assert not extend_task.error
+
+
+def test_start_console(api, web):
+    create_console = api.create_console()
+    assert not create_console.error
+
+    start_console = web.start_console(create_console.data['id'])
+    assert not start_console.error
+
+    delete_console = api.delete_console(create_console.data['id'])
+    assert not delete_console.error
