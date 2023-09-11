@@ -83,6 +83,7 @@ else:
 
 ### PythonAnywhereApi
 * `create_console()` - Create a console
+* `start_console(console_id)` - Start a console
 * `delete_console(console_id)` - Delete a console
 * `list_consoles()` - List active consoles
 * `console_latest_output(console_id)` - Get the latest output from the console
