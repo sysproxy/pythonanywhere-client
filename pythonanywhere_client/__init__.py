@@ -306,7 +306,25 @@ class PythonAnywhereApi:
 
         return Response(
             status_code=response.status_code,
-            error=False,
+            error=response.status_code != 200,
+            data=response_data(response)
+        )
+
+    def reload_app(self, app_name: str):
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/reload/')
+
+        try:
+            response = self.session.post(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
             data=response_data(response)
         )
 

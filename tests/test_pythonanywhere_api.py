@@ -78,3 +78,9 @@ def test_get_tasks(api, constants):
     assert tasks.data[0]['command'] == task.data['command']
     assert tasks.data[0]['hour'] == task.data['hour']
     assert tasks.data[0]['minute'] == task.data['minute']
+
+
+def test_reload_app(api, constants):
+    reload = api.reload_app(constants['PA_APP_NAME'])
+
+    assert not reload.error
