@@ -31,6 +31,9 @@ def response_data(response: Response):
     try:
         return response.json()
     except json.decoder.JSONDecodeError:
+        if not response.text:
+            return None
+
         return {'text': response.text}
 
 
