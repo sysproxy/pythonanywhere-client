@@ -10,6 +10,7 @@ from typing import Union, Optional
 
 import requests
 from requests.cookies import cookiejar_from_dict
+from requests.models import Response
 
 
 def add_months(date: datetime.date, months: int) -> datetime.date:
@@ -19,6 +20,13 @@ def add_months(date: datetime.date, months: int) -> datetime.date:
     day = min(date.day, calendar.monthrange(year, month)[1])
 
     return datetime.datetime(year, month, day).date()
+
+
+def response_data(response: Response):
+    try:
+        return response.json()
+    except json.decoder.JSONDecodeError:
+        return {'text': response.text}
 
 
 @dataclass
@@ -83,7 +91,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 201,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def delete_console(self, console_id: int) -> Response:
@@ -118,7 +126,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 200,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def console_latest_output(self, console_id: int) -> Response:
@@ -136,7 +144,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 200,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def console_input(self, console_id: int, input_string: str) -> Response:
@@ -156,7 +164,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 200,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def get_file(self, path: str) -> Response:
@@ -228,7 +236,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=False,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def delete_task(self, task_id: int) -> Response:
@@ -279,7 +287,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=False,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
     def get_tasks(self) -> Response:
@@ -297,7 +305,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=False,
-            data=json.loads(response.text)
+            data=response_data(response)
         )
 
 
