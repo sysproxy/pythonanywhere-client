@@ -325,6 +325,87 @@ class PythonAnywhereApi:
                 data={'message': traceback.format_exc()}
             )
 
+        data = response_data(response)
+        error = response.status_code != 200 or not (hasattr(data, 'status') or data.get('status') == 'OK')
+
+        return Response(
+            status_code=response.status_code,
+            error=error,
+            data=data
+        )
+
+    def get_static_headers(self, app_name: str):
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_headers/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=response_data(response)
+        )
+
+    def create_static_header(self, app_name: str, header_url: str, name: str, value: str) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_headers/')
+
+        data = {
+            'url': header_url,
+            'name': name,
+            'value': value,
+        }
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 201,
+            data=response_data(response)
+        )
+
+    def delete_static_header(self, app_name: str, header_id: int) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_headers/{header_id}/')
+
+        try:
+            response = self.session.delete(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 204,
+            data=response_data(response)
+        )
+
+    def get_static_header(self, app_name: str, header_id: int) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_headers/{header_id}/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
         return Response(
             status_code=response.status_code,
             error=response.status_code != 200,

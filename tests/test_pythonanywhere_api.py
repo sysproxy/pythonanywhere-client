@@ -84,3 +84,37 @@ def test_reload_app(api, constants):
     reload = api.reload_app(constants['PA_APP_NAME'])
 
     assert not reload.error
+
+
+def test_create_list_get_delete_static_header(api, constants):
+    string = uuid.uuid4().hex
+    header = (string, string, string)
+
+    create_header = api.create_static_header(constants['PA_APP_NAME'], *header)
+    assert not create_header.error
+
+    list_headers = api.get_static_headers(constants['PA_APP_NAME'])
+    assert not list_headers.error
+
+    found = False
+
+    for header in list_headers.data:
+        if header['id'] == create_header.data['id']:
+            assert header['url'] == string
+
+        if header['id'] == create_header.data['id']:
+            found = True
+
+            assert header['url'] == string
+            assert header['name'] == string
+            assert header['value'] == string
+
+    assert found
+
+    get_header = api.get_static_header(constants['PA_APP_NAME'], create_header.data['id'])
+    assert get_header.data['url'] == string
+    assert get_header.data['name'] == string
+    assert get_header.data['value'] == string
+
+    delete_header = api.delete_static_header(constants['PA_APP_NAME'], create_header.data['id'])
+    assert not delete_header.error
