@@ -114,6 +114,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 204,
+            data=response_data(response)
         )
 
     def list_consoles(self) -> Response:
@@ -207,6 +208,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code not in (200, 201),
+            data=response_data(response)
         )
 
     def delete_file(self, path) -> Response:
@@ -224,6 +226,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 204,
+            data=response_data(response)
         )
 
     def can_create_tasks(self) -> Response:
@@ -240,7 +243,7 @@ class PythonAnywhereApi:
 
         return Response(
             status_code=response.status_code,
-            error=False,
+            error=response.status_code != 200,
             data=response_data(response)
         )
 
@@ -283,15 +286,9 @@ class PythonAnywhereApi:
                 data={'message': traceback.format_exc()}
             )
 
-        if response.status_code != 201:
-            return Response(
-                status_code=response.status_code,
-                error=True
-            )
-
         return Response(
             status_code=response.status_code,
-            error=False,
+            error=response.status_code != 201,
             data=response_data(response)
         )
 
