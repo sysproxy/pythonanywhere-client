@@ -13,7 +13,7 @@ def constants():
         'PA_APP_NAME': os.environ.get('PA_APP_NAME'),
         'PA_TOKEN': os.environ.get('PA_TOKEN'),
         'PA_REGION': os.environ.get('PA_REGION'),
-        'PA_CONSOLE_ID': os.environ.get('PA_CONSOLE_ID'),
+        'PA_TIMEOUT': os.environ.get('PA_TIMEOUT', 60),
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/108.0.0.0 Safari/537.36',
         'CSRF_TOKEN_LENGTH': 64,
@@ -36,7 +36,7 @@ def web(constants):
         os.environ.get('PA_PASSWORD')
     )
 
-    p.create_session(constants['USER_AGENT'])
+    p.create_session(constants['USER_AGENT'], constants['PA_TIMEOUT'])
     p.login()
 
     yield p
@@ -52,6 +52,6 @@ def api(constants):
         os.environ.get('PA_REGION'),
     )
 
-    p.create_session(constants['USER_AGENT'])
+    p.create_session(constants['USER_AGENT'], constants['PA_TIMEOUT'])
 
     yield p

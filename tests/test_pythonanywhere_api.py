@@ -20,15 +20,24 @@ def test_list_consoles(api):
     assert len(consoles.data) > 0
 
 
-def test_console_input_output(api, constants):
+def test_console_input_output(api, web, constants):
     string = uuid.uuid4().hex
 
-    input_response = api.console_input(constants['PA_CONSOLE_ID'], f'echo {string}\n')
+    create_console = api.create_console()
+    assert not create_console.error
+
+    start_console = web.start_console(create_console.data['id'])
+    assert not start_console.error
+
+    input_response = api.console_input(create_console.data['id'], f'echo {string}\n')
     assert not input_response.error
 
-    output_response = api.console_latest_output(constants['PA_CONSOLE_ID'])
+    output_response = api.console_latest_output(create_console.data['id'])
     assert not output_response.error
     assert string in output_response.data['output']
+
+    delete_console = api.delete_console(create_console.data['id'])
+    assert not delete_console.error
 
 
 def test_create_get_delete_file(api, constants):

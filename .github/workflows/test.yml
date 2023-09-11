@@ -20,7 +20,6 @@ jobs:
       PA_APP_NAME: ${{ secrets.PA_APP_NAME }}
       PA_TOKEN: ${{ secrets.PA_TOKEN }}
       PA_REGION: ${{ secrets.PA_REGION }}
-      PA_CONSOLE_ID: ${{ secrets.PA_CONSOLE_ID }}
     strategy:
       fail-fast: false
       max-parallel: 1
