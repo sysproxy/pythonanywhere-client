@@ -76,19 +76,24 @@ else:
 * `login()` - Log in to the PythonAnywhere platform
 * `logout()`- Log out from the PythonAnywhere platform
 * `get_app_expiry_date(app_name)` - Get the expiry date of a web application
-* `reload_app(app_name)` - Reload a web application.
-* `get_tasks()`: Get a list of user's tasks.
-* `create_task(command, description, hour, minute, enabled=True, interval='daily')` - Create a new task.
-* `delete_task(task_id)`- Delete a task.
-* `extend_task(task_id)`- Extend the schedule of a task.
-* `extend_app(app_name)`- Extend the schedule of a web application.
-* `can_create_tasks()`- Check if the user is allowed to create tasks.
+* `reload_app(app_name)` - Reload a web application
+* `extend_task(task_id)`- Extend the schedule of a task
+* `extend_app(app_name)`- Extend the schedule of a web application
+
 
 ### PythonAnywhereApi
+* `create_console()` - Create a console
+* `delete_console(console_id)` - Delete a console
 * `list_consoles()` - List active consoles
 * `console_latest_output(console_id)` - Get the latest output from the console
 * `console_input(console_id, input_string)` - Send the input to the console
 * `get_file(path)` - Get the contents of the file
+* `create_file(path, content)` - Create a file
+* `delete_file(path)` - Delete a file
+* `can_create_tasks()`- Check if the user is allowed to create tasks
+* `create_task(command, description, hour, minute, enabled=True, interval='daily')` - Create a new task
+* `delete_task(task_id)`- Delete a task
+* `get_tasks()`: Get a list of user's tasks.
 
 
 ## Contributing
