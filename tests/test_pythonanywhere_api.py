@@ -13,14 +13,7 @@ def test_create_list_delete_console(api):
     assert not delete_console.error
 
 
-def test_list_consoles(api):
-    consoles = api.list_consoles()
-
-    assert not consoles.error
-    assert len(consoles.data) > 0
-
-
-def test_console_input_output(api, web, constants):
+def test_console_input_output(api, web):
     string = uuid.uuid4().hex
 
     create_console = api.create_console()
