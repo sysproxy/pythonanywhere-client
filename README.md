@@ -74,7 +74,7 @@ else:
 ## Methods
 ### PythonAnywhereWeb
 * `login()` - Log in to the PythonAnywhere platform
-* `logout()`- Log out from the PythonAnywhere platform
+* `logout()` - Log out from the PythonAnywhere platform
 * `get_app_expiry_date(app_name)` - Get the expiry date of a web application
 * `reload_app(app_name)` - Reload a web application
 * `extend_task(task_id)`- Extend the schedule of a task
@@ -95,6 +95,7 @@ else:
 * `create_task(command, description, hour, minute, enabled=True, interval='daily')` - Create a new task
 * `delete_task(task_id)`- Delete a task
 * `get_tasks()`: Get a list of user's tasks.
+* `reload_app(app_name)` - Reload a web application
 
 
 ## Contributing
