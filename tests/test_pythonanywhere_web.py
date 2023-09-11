@@ -87,57 +87,10 @@ def test_extend_app(web, constants):
     assert web.get_app_expiry_date(constants['PA_APP_NAME']).data['expiry_date'] >= date
 
 
-def test_create_task(web, constants):
-    task = web.create_task(*constants['TASK'])
-
-    web.delete_task(task.data['id'])
-
-    assert not task.error
-
-
-def test_delete_task(web, constants):
-    task = web.create_task(*constants['TASK'])
-
-    delete = web.delete_task(task.data['id'])
-
-    assert not delete.error
-    assert len(web.get_tasks().data) == 0
-
-
-def test_update_task():
-    pass
-
-
-def test_extend_task(web, constants):
-    task = web.create_task(*constants['TASK'])
+def test_extend_task(api, web, constants):
+    task = api.create_task(*constants['TASK'])
 
     extend_task = web.extend_task(task.data['id'])
-    web.delete_task(task.data['id'])
+    api.delete_task(task.data['id'])
 
     assert not extend_task.error
-
-
-def test_can_create_tasks(web):
-    can_create_tasks = web.can_create_tasks()
-
-    assert not can_create_tasks.error
-    assert 'can_create_tasks' in can_create_tasks.data.keys()
-
-
-def test_get_tasks(web, constants):
-    tasks = web.get_tasks()
-
-    assert not tasks.error
-    assert len(tasks.data) == 0
-
-    task = web.create_task(*constants['TASK'])
-    tasks = web.get_tasks()
-    web.delete_task(task.data['id'])
-
-    assert not tasks.error
-    assert len(tasks.data) == 1
-
-    assert tasks.data[0]['description'] == task.data['description']
-    assert tasks.data[0]['command'] == task.data['command']
-    assert tasks.data[0]['hour'] == task.data['hour']
-    assert tasks.data[0]['minute'] == task.data['minute']

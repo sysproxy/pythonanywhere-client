@@ -41,3 +41,38 @@ def test_create_get_delete_file(api, constants):
 
     delete_file = api.delete_file(constants['FILE_PATH'])
     assert not delete_file.error
+
+
+def test_can_create_tasks(api):
+    can_create_tasks = api.can_create_tasks()
+
+    assert not can_create_tasks.error
+    assert 'can_create_tasks' in can_create_tasks.data.keys()
+    assert can_create_tasks.data['can_create_tasks'] is True
+
+
+def test_create_delete_task(api, constants):
+    task = api.create_task(*constants['TASK'])
+    assert not task.error
+
+    delete = api.delete_task(task.data['id'])
+    assert not delete.error
+
+
+def test_get_tasks(api, constants):
+    tasks = api.get_tasks()
+
+    assert not tasks.error
+    assert len(tasks.data) == 0
+
+    task = api.create_task(*constants['TASK'])
+    tasks = api.get_tasks()
+    api.delete_task(task.data['id'])
+
+    assert not tasks.error
+    assert len(tasks.data) == 1
+
+    assert tasks.data[0]['description'] == task.data['description']
+    assert tasks.data[0]['command'] == task.data['command']
+    assert tasks.data[0]['hour'] == task.data['hour']
+    assert tasks.data[0]['minute'] == task.data['minute']

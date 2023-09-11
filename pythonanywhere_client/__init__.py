@@ -213,6 +213,93 @@ class PythonAnywhereApi:
             error=response.status_code != 204,
         )
 
+    def can_create_tasks(self) -> Response:
+        url = self.create_url('/user_perms/schedule/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=False,
+            data=json.loads(response.text)
+        )
+
+    def delete_task(self, task_id: int) -> Response:
+        url = self.create_url(f'/schedule/{task_id}/')
+
+        try:
+            response = self.session.delete(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 204,
+        )
+
+    def create_task(self, command: str, description: str, hour: int, minute: int, enabled: bool = True,
+                    interval: str = 'daily') -> Response:
+        url = self.create_url('/schedule/')
+
+        data = {
+            'command': command,
+            'description': description,
+            'hour': hour,
+            'minute': minute,
+            'enabled': enabled,
+            'interval': interval
+        }
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        if response.status_code != 201:
+            return Response(
+                status_code=response.status_code,
+                error=True
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=False,
+            data=json.loads(response.text)
+        )
+
+    def get_tasks(self) -> Response:
+        url = self.create_url('/schedule/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=False,
+            data=json.loads(response.text)
+        )
+
 
 class PythonAnywhereWeb:
     BASE_URL = 'https://www.pythonanywhere.com'
@@ -498,118 +585,4 @@ class PythonAnywhereWeb:
         return Response(
             status_code=response.status_code,
             error=False
-        )
-
-    def get_tasks(self) -> Response:
-        url = self.create_url(f'/api/v0/user/{self.username}/schedule/')
-        headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
-
-        try:
-            response = self.session.get(url, headers=headers)
-        except requests.exceptions.RequestException:
-            return Response(
-                status_code=None,
-                error=True,
-                data={'message': traceback.format_exc()}
-            )
-
-        try:
-            return Response(
-                status_code=response.status_code,
-                error=False,
-                data=json.loads(response.text)
-            )
-        except (KeyError, ValueError):
-            return Response(
-                status_code=response.status_code,
-                error=True,
-            )
-
-    def create_task(self, command: str, description: str, hour: int, minute: int, enabled: bool = True,
-                    interval: str = 'daily') -> Response:
-        url = self.create_url(f'/api/v0/user/{self.username}/schedule/')
-
-        data = {
-            'command': command,
-            'description': description,
-            'hour': hour,
-            'minute': minute,
-            'enabled': enabled,
-            'interval': interval
-        }
-
-        headers = {
-            'Referer': self.create_url(f'/user/{self.username}/tasks_tab/'),
-            'X-CSRFToken': self.get_csrf_token().data['csrf_token']
-        }
-
-        try:
-            response = self.session.post(url, data=data, headers=headers)
-        except requests.exceptions.RequestException:
-            return Response(
-                status_code=None,
-                error=True,
-                data={'message': traceback.format_exc()}
-            )
-
-        if response.status_code != 201:
-            return Response(
-                status_code=response.status_code,
-                error=True
-            )
-
-        return Response(
-            status_code=response.status_code,
-            error=False,
-            data=json.loads(response.text)
-        )
-
-    def update_task(self, task_id: int):
-        pass
-
-    def delete_task(self, task_id: int) -> Response:
-        url = self.create_url(f'/api/v0/user/{self.username}/schedule/{task_id}/')
-
-        headers = {
-            'Referer': self.create_url(f'/user/{self.username}/tasks_tab/'),
-            'X-CSRFToken': self.get_csrf_token().data['csrf_token']
-        }
-
-        try:
-            response = self.session.delete(url, headers=headers)
-        except requests.exceptions.RequestException:
-            return Response(
-                status_code=None,
-                error=True,
-                data={'message': traceback.format_exc()}
-            )
-
-        return Response(
-            status_code=response.status_code,
-            error=response.status_code != 204,
-        )
-
-    def can_create_tasks(self) -> Response:
-        url = self.create_url(f'/api/v0/user/{self.username}/user_perms/schedule/')
-        headers = {'Referer': self.create_url(f'/user/{self.username}/tasks_tab/')}
-
-        try:
-            response = self.session.get(url, headers=headers)
-        except requests.exceptions.RequestException:
-            return Response(
-                status_code=None,
-                error=True,
-                data={'message': traceback.format_exc()}
-            )
-
-        if response.status_code != 200:
-            return Response(
-                status_code=response.status_code,
-                error=True
-            )
-
-        return Response(
-            status_code=response.status_code,
-            error=False,
-            data=json.loads(response.text)
         )
