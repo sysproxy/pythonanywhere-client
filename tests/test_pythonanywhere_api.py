@@ -118,3 +118,10 @@ def test_create_list_get_delete_static_header(api, constants):
 
     delete_header = api.delete_static_header(constants['PA_APP_NAME'], create_header.data['id'])
     assert not delete_header.error
+
+def test_disable_enable_app(api, constants):
+    disable = api.disable_app(constants['PA_APP_NAME'])
+    assert not disable.error
+
+    enable = api.enable_app(constants['PA_APP_NAME'])
+    assert not enable.error

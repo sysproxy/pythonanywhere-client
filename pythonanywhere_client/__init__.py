@@ -334,6 +334,48 @@ class PythonAnywhereApi:
             data=data
         )
 
+    def enable_app(self, app_name: str):
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/enable/')
+
+        try:
+            response = self.session.post(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        data = response_data(response)
+        error = response.status_code != 200 or not (hasattr(data, 'status') or data.get('status') == 'OK')
+
+        return Response(
+            status_code=response.status_code,
+            error=error,
+            data=data
+        )
+
+    def disable_app(self, app_name: str):
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/disable/')
+
+        try:
+            response = self.session.post(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        data = response_data(response)
+        error = response.status_code != 200 or not (hasattr(data, 'status') or data.get('status') == 'OK')
+
+        return Response(
+            status_code=response.status_code,
+            error=error,
+            data=data
+        )
+
     def get_static_headers(self, app_name: str):
         url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_headers/')
 
