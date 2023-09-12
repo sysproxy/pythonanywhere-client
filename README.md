@@ -1,11 +1,13 @@
 # PythonAnywhere Client
 
-This is a Python client library for interacting with the PythonAnywhere platform. The library provides functions to 
-manage web applications, tasks, and other features offered by PythonAnywhere. It uses the requests library for making 
+This is a Python client library for interacting with the PythonAnywhere platform. The library provides functions to
+manage web applications, tasks, and other features offered by PythonAnywhere. It uses the requests library for making
 HTTP requests and provides a simple interface to perform various tasks.
 
 ## Installation
+
 You can install it using pip
+
 ```shell
 pip install pythonanywhere-client
 ```
@@ -13,6 +15,7 @@ pip install pythonanywhere-client
 ## Usage
 
 ### PythonAnywhereWeb
+
 ```python
 from pythonanywhere_client import PythonAnywhereWeb
 
@@ -49,6 +52,7 @@ else:
 ```
 
 ### PythonAnywhereApi
+
 ```python
 from pythonanywhere_client import PythonAnywhereApi
 
@@ -67,12 +71,14 @@ if file_response.error:
     print('Error: ', file_response.data['message'])
 else:
     print('File content: ', file_response.data['content'])
-    
+
 # ... (other methods)
 ```
 
 ## Methods
+
 ### PythonAnywhereWeb
+
 * `login()` - Log in to the PythonAnywhere platform
 * `logout()` - Log out from the PythonAnywhere platform
 * `get_app_expiry_date(app_name)` - Get the expiry date of a web application
@@ -81,8 +87,8 @@ else:
 * `extend_app(app_name)`- Extend the schedule of a web application
 * `start_console(console_id)` - Start a console
 
-
 ### PythonAnywhereApi
+
 * `create_console()` - Create a console
 * `delete_console(console_id)` - Delete a console
 * `list_consoles()` - List active consoles
@@ -108,5 +114,6 @@ else:
 * `get_static_path(app_name: str, static_path_id: int)` - Show a static path
 
 ## Contributing
-Contributions to this project are welcome! If you find any issues or have suggestions for improvements, 
+
+Contributions to this project are welcome! If you find any issues or have suggestions for improvements,
 feel free to open an issue or submit a pull request.
