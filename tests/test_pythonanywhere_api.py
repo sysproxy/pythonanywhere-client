@@ -100,9 +100,6 @@ def test_create_list_get_delete_static_header(api, constants):
 
     for header in list_headers.data:
         if header['id'] == create_header.data['id']:
-            assert header['url'] == string
-
-        if header['id'] == create_header.data['id']:
             found = True
 
             assert header['url'] == string
@@ -119,9 +116,39 @@ def test_create_list_get_delete_static_header(api, constants):
     delete_header = api.delete_static_header(constants['PA_APP_NAME'], create_header.data['id'])
     assert not delete_header.error
 
+
 def test_disable_enable_app(api, constants):
     disable = api.disable_app(constants['PA_APP_NAME'])
     assert not disable.error
 
     enable = api.enable_app(constants['PA_APP_NAME'])
     assert not enable.error
+
+
+def test_create_list_get_delete_static_path(api, constants):
+    string = uuid.uuid4().hex
+    data = (string, string)
+
+    create_path = api.create_static_path(constants['PA_APP_NAME'], *data)
+    assert not create_path.error
+
+    list_paths = api.get_static_paths(constants['PA_APP_NAME'])
+    assert not list_paths.error
+
+    found = False
+
+    for path in list_paths.data:
+        if path['id'] == create_path.data['id']:
+            found = True
+
+            assert path['url'] == string
+            assert path['path'] == string
+
+    assert found
+
+    get_path = api.get_static_path(constants['PA_APP_NAME'], create_path.data['id'])
+    assert get_path.data['url'] == string
+    assert get_path.data['path'] == string
+
+    delete_path = api.delete_static_path(constants['PA_APP_NAME'], create_path.data['id'])
+    assert not delete_path.error

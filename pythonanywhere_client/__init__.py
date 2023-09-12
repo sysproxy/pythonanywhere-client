@@ -454,6 +454,83 @@ class PythonAnywhereApi:
             data=response_data(response)
         )
 
+    def get_static_paths(self, app_name: str):
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_files/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=response_data(response)
+        )
+
+    def create_static_path(self, app_name: str, static_path_url: str, path: str) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_files/')
+
+        data = {
+            'url': static_path_url,
+            'path': path,
+        }
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 201,
+            data=response_data(response)
+        )
+
+    def delete_static_path(self, app_name: str, static_path_id: int) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_files/{static_path_id}/')
+
+        try:
+            response = self.session.delete(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 204,
+            data=response_data(response)
+        )
+
+    def get_static_path(self, app_name: str, static_path_id: int) -> Response:
+        url = self.create_url(f'/webapps/{app_name}.pythonanywhere.com/static_files/{static_path_id}/')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=response_data(response)
+        )
+
 
 class PythonAnywhereWeb:
     BASE_URL = 'https://www.pythonanywhere.com'
