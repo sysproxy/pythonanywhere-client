@@ -79,11 +79,11 @@ else:
 * `reload_app(app_name)` - Reload a web application
 * `extend_task(task_id)`- Extend the schedule of a task
 * `extend_app(app_name)`- Extend the schedule of a web application
+* `start_console(console_id)` - Start a console
 
 
 ### PythonAnywhereApi
 * `create_console()` - Create a console
-* `start_console(console_id)` - Start a console
 * `delete_console(console_id)` - Delete a console
 * `list_consoles()` - List active consoles
 * `console_latest_output(console_id)` - Get the latest output from the console
@@ -92,11 +92,20 @@ else:
 * `create_file(path, content)` - Create a file
 * `delete_file(path)` - Delete a file
 * `can_create_tasks()`- Check if the user is allowed to create tasks
-* `create_task(command, description, hour, minute, enabled=True, interval='daily')` - Create a new task
+* `create_task(command, description, hour, minute, enabled=True, interval='daily')` - Create a task
 * `delete_task(task_id)`- Delete a task
 * `get_tasks()`: Get a list of user's tasks.
 * `reload_app(app_name)` - Reload a web application
-
+* `enable_app(app_name)` - Enable a web application
+* `disable_app(app_name)` - Disable a web application
+* `get_static_headers(app_name)` - List static headers for an application
+* `create_static_header(app_name: str, header_url: str, name: str, value: str)` - Create a static header
+* `delete_static_header(app_name: str, header_id: int)` - Delete a static header
+* `get_static_header(app_name: str, header_id: int)` - Show a static header
+* `get_static_paths(app_name)` - List static paths for an application
+* `create_static_path(app_name: str, static_path_url: str, path: str)` - Create a static path
+* `delete_static_path(app_name: str, static_path_id: int)` - Delete a static path
+* `get_static_path(app_name: str, static_path_id: int)` - Show a static path
 
 ## Contributing
 Contributions to this project are welcome! If you find any issues or have suggestions for improvements, 
