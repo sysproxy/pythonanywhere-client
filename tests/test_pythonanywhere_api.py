@@ -1,5 +1,7 @@
 import uuid
 
+from pythonanywhere_client import decode_file_content
+
 
 def test_create_list_delete_console(api):
     create_console = api.create_console()
@@ -34,12 +36,13 @@ def test_console_input_output(api, web):
 
 
 def test_create_get_delete_file(api, constants):
-    create_file = api.create_file(constants['FILE_PATH'], bytes(constants['FILE_CONTENT'], 'utf-8'))
+    create_file = api.create_file(constants['FILE_PATH'], constants['FILE_CONTENT'])
     assert not create_file.error
 
     get_file = api.get_file(constants['FILE_PATH'])
     assert not get_file.error
-    assert constants['FILE_CONTENT'] in get_file.data['content']
+
+    assert constants['FILE_CONTENT'] == decode_file_content(get_file.data['content'])
 
     delete_file = api.delete_file(constants['FILE_PATH'])
     assert not delete_file.error

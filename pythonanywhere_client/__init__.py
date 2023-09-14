@@ -1,5 +1,6 @@
 __version__ = '1.1.4'
 
+import base64
 import calendar
 import datetime
 import json
@@ -35,6 +36,9 @@ def response_data(response: Response):
             return None
 
         return {'text': response.text}
+
+def decode_file_content(content: str) -> bytes:
+    return base64.b64decode(content.encode('ascii'))
 
 
 @dataclass
@@ -191,7 +195,7 @@ class PythonAnywhereApi:
         return Response(
             status_code=response.status_code,
             error=response.status_code != 200,
-            data={'content': response.text}
+            data={'content': base64.b64encode(response.content).decode('ascii')}
         )
 
     def create_file(self, path: str, content: bytes) -> Response:

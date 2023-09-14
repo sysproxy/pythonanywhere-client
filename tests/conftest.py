@@ -25,7 +25,7 @@ def constants():
             True
         ),
         'FILE_PATH': f"/home/{os.environ.get('PA_USERNAME')}/.test.txt",
-        'FILE_CONTENT': 'Test content',
+        'FILE_CONTENT': b'Test content',
     }
 
 
