@@ -37,6 +37,7 @@ def response_data(response: Response):
 
         return {'text': response.text}
 
+
 def decode_file_content(content: str) -> bytes:
     return base64.b64decode(content.encode('ascii'))
 
