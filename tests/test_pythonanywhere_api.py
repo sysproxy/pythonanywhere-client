@@ -155,3 +155,8 @@ def test_create_list_get_delete_static_path(api, constants):
 
     delete_path = api.delete_static_path(constants['PA_APP_NAME'], create_path.data['id'])
     assert not delete_path.error
+
+
+def test_get_dir(api, constants):
+    get_dir = api.get_dir(f"/home/{constants['PA_APP_NAME']}")
+    assert not get_dir.error

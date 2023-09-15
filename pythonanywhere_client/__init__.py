@@ -255,6 +255,24 @@ class PythonAnywhereApi:
             data=response_data(response)
         )
 
+    def get_dir(self, path: str) -> Response:
+        url = self.create_url(f'/files/tree/?path={path}')
+
+        try:
+            response = self.session.get(url)
+        except requests.exceptions.RequestException:
+            return Response(
+                status_code=None,
+                error=True,
+                data={'message': traceback.format_exc()}
+            )
+
+        return Response(
+            status_code=response.status_code,
+            error=response.status_code != 200,
+            data=response_data(response)
+        )
+
     def delete_task(self, task_id: int) -> Response:
         url = self.create_url(f'/schedule/{task_id}/')
 
